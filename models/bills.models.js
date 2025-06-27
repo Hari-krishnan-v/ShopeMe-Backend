@@ -33,10 +33,6 @@ const billsSchema = new mongoose.Schema({
         enum: ['cash', 'card', 'online'],
         required: true
     },
-    upi_qr_code: {
-        type: String, // base64 or URL
-        required: function() { return this.payment_mode === 'online'; }
-    },
     payment_status: {
         type: String,
         enum: ['pending', 'completed', 'failed'],

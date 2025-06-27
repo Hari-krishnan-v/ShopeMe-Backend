@@ -4,11 +4,11 @@ import {
     createStaff,
     deleteStaff,
     getAllStaff,
-    updateStaffProfile
+    updateStaffProfile,
+    loginStaff
 } from "../controllers/staff.controller.js";
 
 const StaffRouter = Router();
-
 
 
 StaffRouter.get('/', getAllStaff);
@@ -20,3 +20,7 @@ StaffRouter.post('/', createStaff);
 StaffRouter.put('/:id', updateStaffProfile);
 
 StaffRouter.delete('/:id', deleteStaff);
+
+StaffRouter.post('/login',loginStaff)
+
+export default StaffRouter;
