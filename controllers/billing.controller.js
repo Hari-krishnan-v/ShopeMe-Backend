@@ -1,6 +1,7 @@
 import billsModels from "../models/bills.models.js";
 import StockLog from "../models/stock_log.models.js";
 import mongoose from "mongoose";
+import bulkOperationUpdateProduct from "../utility/bulkOperation.update.product.js";
 
 export const createBill = async (req, res, next) => {
     const session = await mongoose.startSession();
@@ -26,12 +27,9 @@ export const createBill = async (req, res, next) => {
 
     const grandTotal = total_amount + gstAmount;
 
-    if(payment_method !== 'cash' && payment_method !== 'card' && payment_method !== 'online') {
-        return res.status(400).json({ error: 'Invalid payment method' });
-    }
-    if(payment_method === 'cash'){
-        paymentstatus = 'completed';
-    }
+    // if online playement chcek the payment status or the payment gateway response is valid
+    // if the payment is valid set the paymentstatus to completed
+
 
     const newBill = await billsModels.create([{
         bill_number: billNumber,
@@ -49,9 +47,23 @@ export const createBill = async (req, res, next) => {
     ], { session });
 
     // Update stock for each item in the bill
+        await bulkOperationUpdateProduct(items, session);
 
-    await session.commitTransaction();
-    session.endSession();
+    // add the stock log to a temporary model then add Timeout to the stock log utility to update the stock
+
+        const stockLogs = items.map(item => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+            action: "decrease",
+            reason: "bill_issued",
+            related_bill: newBill[0]._id
+        }));
+
+        await StockLog.insertMany(stockLogs, { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
     res.status(201).json({
         message: 'Bill created successfully',
         bill: {
@@ -73,3 +85,25 @@ export const createBill = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getAllBills = async (req, res, next) => {
+    try {
+        const bills = await billsModels.find().populate('staff_id', 'name email').sort({ createdAt: -1 });
+        res.status(200).json(bills);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getBillById = async (req, res, next) => {
+    try {
+        const bill = await billsModels.findById(req.params.id).populate('staff_id', 'name email').populate('items.product_id', 'name price');
+        if (!bill) {
+            return res.status(404).json({ error: 'Bill not found' });
+        }
+        res.status(200).json(bill);
+    } catch (error) {
+        next(error);
+    }
+}
+

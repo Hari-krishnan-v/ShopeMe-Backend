@@ -1,6 +1,9 @@
 import Product from '../models/products.models.js';
 import mongoose from 'mongoose';
 
+
+// these may admin or inventory manager functions
+
 export const createProduct = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction()

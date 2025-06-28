@@ -6,6 +6,7 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
 import StaffRouter from "./routes/staff.routes.js";
 import ProductRouter from "./routes/product.routes.js";
+import billingRoutes from "./routes/billing.routes.js";
 
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(errorMiddleware);
 // routers
 app.use('/api/staff', StaffRouter);
 app.use('/api/products', ProductRouter);
+app.use('/api/bill', billingRoutes)
 
 
 app.get('/', (req, res) => {
