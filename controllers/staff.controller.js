@@ -56,7 +56,7 @@ export const loginStaff = async (req, res, next) => {
         }
         const isMatch = await staff.comparePassword(password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ error: 'Invalid password' });
         }
         const token = jwt.sign({ id: staff._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
         res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
@@ -78,7 +78,7 @@ export const loginStaff = async (req, res, next) => {
 
 export const getStaffProfile = async (req, res, next) => {
     try {
-        const staffId = req.staff.id;
+        const staffId = req.params.id;
         const staff = await Staff.findById(staffId).select('-password');
         if (!staff) {
             return res.status(404).json({ error: 'Staff not found' });
@@ -96,7 +96,7 @@ export const updateStaffProfile = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const staffId = req.staff.id;
+        const staffId = req.params.id;
         const { name, email, phone_number, address } = req.body;
         if (!name || !email || !phone_number || !address) {
             return res.status(400).json({ error: 'All fields are required' });

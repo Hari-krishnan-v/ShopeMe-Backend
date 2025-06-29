@@ -7,19 +7,21 @@ import {
     updateStaffProfile,
     loginStaff
 } from "../controllers/staff.controller.js";
+import {authenticateStaff} from "../middlewares/authentication.middleware.js";
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const StaffRouter = Router();
 
 
-StaffRouter.get('/', getAllStaff);
+StaffRouter.get('/', authenticateStaff,isAdmin,getAllStaff);
 
-StaffRouter.get('/:id', getStaffProfile);
+StaffRouter.get('/:id',authenticateStaff,isAdmin, getStaffProfile);
 
-StaffRouter.post('/', createStaff);
+StaffRouter.post('/',authenticateStaff,isAdmin, createStaff);
 
-StaffRouter.put('/:id', updateStaffProfile);
+StaffRouter.put('/:id',authenticateStaff,isAdmin, updateStaffProfile);
 
-StaffRouter.delete('/:id', deleteStaff);
+StaffRouter.delete('/:id',authenticateStaff,isAdmin, deleteStaff);
 
 StaffRouter.post('/login',loginStaff)
 

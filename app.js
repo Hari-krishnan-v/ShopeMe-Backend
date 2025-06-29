@@ -7,6 +7,8 @@ import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
 import StaffRouter from "./routes/staff.routes.js";
 import ProductRouter from "./routes/product.routes.js";
 import billingRoutes from "./routes/billing.routes.js";
+import {NODE_ENV} from "./config/env.js";
+import CategoryRouter from "./routes/category.routes.js";
 
 
 const app = express();
@@ -15,13 +17,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(arcjetMiddleware);
+if(NODE_ENV==='production'){
+    app.use(arcjetMiddleware);
+}
+
 app.use(errorMiddleware);
 
 // routers
 app.use('/api/staff', StaffRouter);
 app.use('/api/products', ProductRouter);
 app.use('/api/bill', billingRoutes)
+app.use('/api/categories', CategoryRouter)
 
 
 app.get('/', (req, res) => {
