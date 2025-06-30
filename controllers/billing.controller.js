@@ -54,8 +54,8 @@ export const createBill = async (req, res, next) => {
         const stockLogs = items.map(item => ({
             product_id: item.product_id,
             quantity: item.quantity,
-            action: "decrease",
-            reason: "bill_issued",
+            action: "remove",
+            reason: "purchase",
             related_bill: newBill[0]._id
         }));
 
